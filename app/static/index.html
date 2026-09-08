@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CODEX AI MARKET</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07111f;color:#eef4ff;font-family:system-ui,-apple-system,sans-serif}.app{max-width:520px;margin:auto;min-height:100vh;padding:16px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.brand{font-weight:900;font-size:21px}.pill{background:#10233c;border:1px solid #23415f;padding:8px 11px;border-radius:999px;font-size:12px}.card{background:#0d1a2b;border:1px solid #1d3554;border-radius:17px;padding:14px;margin:10px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{font-size:11px;color:#8ea7c7;display:block;margin-bottom:6px}select,button{width:100%;border:1px solid #294666;background:#101f32;color:#fff;border-radius:11px;padding:12px;font-size:14px}.strategies{display:grid;grid-template-columns:1fr 1fr;gap:8px}.strategy{padding:11px;background:#101f32;border-radius:11px;font-size:12px}.strategy input{accent-color:#2c7cff}.primary{background:#2c7cff;border:0;margin-top:12px;font-weight:900}.status{font-size:12px;color:#8ea7c7;min-height:20px}.signal{text-align:center;padding:18px}.direction{font-size:37px;font-weight:950}.call{color:#42e6a4}.put{color:#ff6f8f}.wait{color:#ffd166}.bar{height:8px;background:#142943;border-radius:99px;overflow:hidden}.fill{height:100%;background:#2c7cff;width:0;transition:.3s}.metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a304a;font-size:13px}.reason{font-size:12px;color:#b7c8df;padding:5px 0}.small{font-size:11px;color:#7890ae}.error{color:#ff879d}
+</style>
+</head>
+<body>
+<main class="app">
+<div class="top"><div class="brand">CODEX AI MARKET</div><div class="pill">BINANY • PAPER</div></div>
+<div class="card grid">
+<div><label>MARKET</label><select id="market"><option value="REAL">REAL MARKET</option><option value="OTC">OTC</option></select></div>
+<div><label>ASSET</label><select id="asset"><option>BTCUSDT</option><option>ETHUSDT</option><option>BNBUSDT</option><option>EURUSDT</option></select></div>
+<div><label>TIMEFRAME</label><select id="tf"><option value="1m">1 MIN</option><option value="5m">5 MIN</option><option value="15m">15 MIN</option></select></div>
+<div><label>EXPIRY</label><select id="expiry"><option value="60">60 SEC</option><option value="300">5 MIN</option></select></div>
+</div>
+<div class="card"><label>STRATEGIES</label><div class="strategies">
+<label class="strategy"><input checked type="checkbox" value="ema_rsi"> EMA + RSI</label>
+<label class="strategy"><input checked type="checkbox" value="price_action"> Price Action</label>
+<label class="strategy"><input checked type="checkbox" value="bollinger"> Bollinger</label>
+<label class="strategy"><input checked type="checkbox" value="support_resistance"> Support/Resistance</label>
+</div><button class="primary" id="generate">GENERATE SIGNAL</button></div>
+<div class="card"><div class="status" id="status">Ready.</div><div class="signal"><div id="direction" class="direction wait">WAIT</div><div id="confidence">Confidence —</div></div><div class="bar"><div id="fill" class="fill"></div></div>
+<div class="metric"><span>Asset</span><b id="mAsset">BTCUSDT</b></div><div class="metric"><span>RSI</span><b id="rsi">—</b></div><div class="metric"><span>EMA 9 / 21</span><b id="ema">—</b></div><div class="metric"><span>Expiry</span><b id="mExpiry">60s</b></div><div id="reasons"></div></div>
+<div class="card"><b>Risk Guard</b><div class="small" style="margin-top:6px">Paper mode • fixed stake • cooldown • daily trade cap • live execution disabled</div></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+async function run(){
+ const status=$('status');status.textContent='Scanning market → indicators → validation…';status.className='status';
+ const strategies=[...document.querySelectorAll('.strategy input:checked')].map(x=>x.value);
+ const req={symbol:$('asset').value,timeframe:$('tf').value,expiry_seconds:+$('expiry').value,market:$('market').value,strategies};
+ try{
+  const r=await fetch('/api/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(req)});
+  const s=await r.json();if(!r.ok)throw new Error(s.detail||'Signal request failed');
+  status.textContent='Signal validated from market data.';
+  const d=$('direction');d.textContent=s.direction;d.className='direction '+s.direction.toLowerCase();
+  $('confidence').textContent='Confidence '+s.confidence+'%';$('fill').style.width=s.confidence+'%';$('mAsset').textContent=s.symbol;
+  $('rsi').textContent=s.indicators.rsi.toFixed(2);$('ema').textContent=s.indicators.ema9.toFixed(4)+' / '+s.indicators.ema21.toFixed(4);
+  $('mExpiry').textContent=s.expiry_seconds+'s';$('reasons').innerHTML=s.reasons.map(x=>'<div class="reason">• '+x+'</div>').join('');
+ }catch(e){status.textContent=e.message;status.className='status error'}
+}
+$('generate').onclick=run;
+</script>
+</body>
+</html>

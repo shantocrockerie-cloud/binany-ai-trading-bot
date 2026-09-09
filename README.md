@@ -24,7 +24,7 @@ Mobile-first signal dashboard matching the supplied screen-recording concept: RE
 Android / Browser
        │
        ▼
-FastAPI :8000
+FastAPI :8082
  ┌───────────────┐
  │ Web dashboard │
  └───────┬───────┘
@@ -73,19 +73,19 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8082
 ```
 
 Open on the same Android device:
 
 ```text
-http://127.0.0.1:8000
+http://127.0.0.1:8082
 ```
 
 Health check:
 
 ```text
-http://127.0.0.1:8000/health
+http://127.0.0.1:8082/health
 ```
 
 ### One-command startup

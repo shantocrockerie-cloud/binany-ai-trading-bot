@@ -5,4 +5,4 @@ cd "$(dirname "$0")"
 source .venv/bin/activate
 pip install -r requirements.txt
 [ -f .env ] || cp .env.example .env
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+exec uvicorn app.main:app --host 0.0.0.0 --port 8082

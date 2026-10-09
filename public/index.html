@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CODEX AI MARKET</title>
+<title>CODEX AI MARKET — Binany Bot</title>
+<meta name="description" content="Mobile-first signal dashboard with REAL/OTC market analysis, confluence indicators, and risk guard.">
+<meta property="og:title" content="CODEX AI MARKET — Binany Bot">
+<meta property="og:description" content="Mobile-first signal dashboard with REAL/OTC market analysis, confluence indicators, and risk guard.">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#07111f;color:#eef4ff;font-family:system-ui,-apple-system,sans-serif}.app{max-width:520px;margin:auto;min-height:100vh;padding:16px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.brand{font-weight:900;font-size:21px}.pill{background:#10233c;border:1px solid #23415f;padding:8px 11px;border-radius:999px;font-size:12px}.card{background:#0d1a2b;border:1px solid #1d3554;border-radius:17px;padding:14px;margin:10px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{font-size:11px;color:#8ea7c7;display:block;margin-bottom:6px}select,button{width:100%;border:1px solid #294666;background:#101f32;color:#fff;border-radius:11px;padding:12px;font-size:14px}.strategies{display:grid;grid-template-columns:1fr 1fr;gap:8px}.strategy{padding:11px;background:#101f32;border-radius:11px;font-size:12px}.strategy input{accent-color:#2c7cff}.primary{background:#2c7cff;border:0;margin-top:12px;font-weight:900}.status{font-size:12px;color:#8ea7c7;min-height:20px}.signal{text-align:center;padding:18px}.direction{font-size:37px;font-weight:950}.call{color:#42e6a4}.put{color:#ff6f8f}.wait{color:#ffd166}.bar{height:8px;background:#142943;border-radius:99px;overflow:hidden}.fill{height:100%;background:#2c7cff;width:0;transition:.3s}.metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a304a;font-size:13px}.reason{font-size:12px;color:#b7c8df;padding:5px 0}.small{font-size:11px;color:#7890ae}.error{color:#ff879d}
 </style>
@@ -34,7 +37,7 @@ async function run(){
  const req={symbol:$('asset').value,timeframe:$('tf').value,expiry_seconds:+$('expiry').value,market:$('market').value,strategies};
  try{
   const r=await fetch('/api/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(req)});
-  const s=await r.json();if(!r.ok)throw new Error(s.detail||'Signal request failed');
+  const s=await r.json();if(!r.ok)throw new Error(s.detail||s.error||'Signal request failed');
   status.textContent='Signal validated from market data.';
   const d=$('direction');d.textContent=s.direction;d.className='direction '+s.direction.toLowerCase();
   $('confidence').textContent='Confidence '+s.confidence+'%';$('fill').style.width=s.confidence+'%';$('mAsset').textContent=s.symbol;

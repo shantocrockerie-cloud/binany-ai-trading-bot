@@ -1,0 +1,8 @@
+{
+  "name": "CODEX AI MARKET — Binany Bot",
+  "description": "Mobile-first signal dashboard with REAL/OTC market analysis, confluence indicators, and risk guard.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

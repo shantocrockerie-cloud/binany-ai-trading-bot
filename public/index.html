@@ -50,101 +50,98 @@ body {
   padding: 14px 16px;
 }
 
-/* Demo / risk disclaimer */
-.demo-warning {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px 10px;
-  margin: 12px 0 16px;
-  padding: 10px 12px;
-  border: 1px solid rgba(245, 158, 11, 0.38);
-  border-radius: var(--radius-sm);
-  background: rgba(120, 53, 15, 0.22);
-  color: #fcd9a1;
-  font-size: 12px;
-}
-.demo-warning strong {
-  color: #fbbf24;
-  letter-spacing: 0.035em;
-}
-
 /* Top Navigation Bar */
 .top-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 14px;
+  gap: 8px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
+  flex-wrap: nowrap;
 }
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: inherit;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 1;
 }
 .brand-logo {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   background: linear-gradient(135deg, #0284c7, #38bdf8);
-  border-radius: 9px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
 }
-.brand-logo svg { width: 20px; height: 20px; fill: #ffffff; }
+.brand-logo svg { width: 18px; height: 18px; fill: #ffffff; }
 .brand-name {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 .brand-badge {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   background: var(--bg-card-subtle);
   color: var(--accent-blue);
   border: 1px solid var(--border-focus);
-  padding: 2px 7px;
-  border-radius: 6px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 .top-stats {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 .wallet-box {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  white-space: nowrap;
 }
-.wallet-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; }
-.wallet-val { font-size: 14px; font-weight: 700; color: #42e6a4; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+.wallet-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+.wallet-val { font-size: 13px; font-weight: 700; color: #42e6a4; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
 .sound-btn {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all .2s;
+  flex-shrink: 0;
 }
 .sound-btn:hover { color: var(--text-main); border-color: var(--border-focus); }
+
+@media (max-width: 440px) {
+  .wallet-label { display: none; }
+  .brand-name { font-size: 14px; }
+  .brand-logo { width: 28px; height: 28px; }
+  .brand-logo svg { width: 16px; height: 16px; }
+  .wallet-box { padding: 4px 8px; }
+  .wallet-val { font-size: 12px; }
+}
 
 /* Quick Assets Strip (The First 6 Assets) */
 .section-title-row {
@@ -161,16 +158,18 @@ body {
   color: var(--text-dim);
 }
 .quick-assets-scroll {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(130px, 1fr));
+  display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
   margin-bottom: 14px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-subtle) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 .asset-card {
+  flex: 0 0 148px;
+  min-width: 148px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -181,7 +180,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   gap: 6px;
-  min-height: 70px;
+  min-height: 72px;
   user-select: none;
 }
 .asset-card:hover {
@@ -877,11 +876,6 @@ body {
       </button>
     </div>
   </header>
-
-  <div class="demo-warning" role="note" aria-label="Demo trading warning">
-    <strong>DEMO / PAPER TRADING ONLY</strong>
-    <span>OTC, synthetic, unsupported, or fallback candles may be simulated. Price ticks are not guaranteed live market data. No real orders are placed.</span>
-  </div>
 
   <!-- Featured First 6 Assets Strip (Binany) -->
   <div class="section-title-row">

@@ -14,10 +14,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const configuredPort = process.env.PORT || process.env.APP_PORT || '3000';
-const parsedPort = Number.parseInt(configuredPort, 10);
-const PORT = Number.isInteger(parsedPort) && parsedPort > 0 && parsedPort <= 65535 ? parsedPort : 3000;
-const HOST = process.env.APP_HOST || '0.0.0.0';
+const PORT = 3000;
+const HOST = '0.0.0.0';
 
 const settings = {
   app_host: HOST,

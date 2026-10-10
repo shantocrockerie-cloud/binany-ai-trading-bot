@@ -2,15 +2,16 @@
 
 ## Development
 
-1. Create a Python virtual environment.
-2. Install dependencies from `requirements.txt`.
-3. Keep `PAPER_MODE=true` during development.
-4. Run `make check` before submitting changes.
-5. Keep secrets out of source control.
+1. Install Node.js 22+ and npm.
+2. Run `npm install`.
+3. Copy `.env.example` to `.env` if you want to customize local settings.
+4. Run `npm run dev` to start the local dashboard.
+5. Run `npm run build` before submitting a pull request.
+6. Keep `.env` files and all credentials out of source control.
 
 ## Pull requests
 
-- Explain the behavior change clearly.
-- Include reproducible testing steps.
-- Do not add browser automation or credential-based Binany execution.
-- Preserve the paper-trading safety boundary unless an authorized API integration is separately documented and reviewed.
+- Explain behavior changes and include reproducible test steps.
+- Clearly label mock/simulated market data; never present it as a live quote.
+- Do not add browser automation or credential-based broker execution.
+- Preserve paper-trading-only behavior unless an authorized API integration is separately documented and security-reviewed.

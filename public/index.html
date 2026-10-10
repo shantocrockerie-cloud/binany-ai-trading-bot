@@ -50,6 +50,25 @@ body {
   padding: 14px 16px;
 }
 
+/* Demo / risk disclaimer */
+.demo-warning {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin: 12px 0 16px;
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.38);
+  border-radius: var(--radius-sm);
+  background: rgba(120, 53, 15, 0.22);
+  color: #fcd9a1;
+  font-size: 12px;
+}
+.demo-warning strong {
+  color: #fbbf24;
+  letter-spacing: 0.035em;
+}
+
 /* Top Navigation Bar */
 .top-nav {
   display: flex;
@@ -858,6 +877,11 @@ body {
       </button>
     </div>
   </header>
+
+  <div class="demo-warning" role="note" aria-label="Demo trading warning">
+    <strong>DEMO / PAPER TRADING ONLY</strong>
+    <span>OTC, synthetic, unsupported, or fallback candles may be simulated. Price ticks are not guaranteed live market data. No real orders are placed.</span>
+  </div>
 
   <!-- Featured First 6 Assets Strip (Binany) -->
   <div class="section-title-row">

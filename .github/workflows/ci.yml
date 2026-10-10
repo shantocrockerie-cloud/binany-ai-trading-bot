@@ -7,20 +7,19 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: "3.12"
-          cache: pip
+          node-version: "22"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: npm install --no-audit --no-fund
 
-      - name: Compile Python source
-        run: python -m py_compile app/main.py
+      - name: Type-check TypeScript
+        run: npm run build

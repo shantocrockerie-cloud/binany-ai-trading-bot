@@ -847,37 +847,6 @@ body {
   display: none;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* Firebase Auth Button */
-.btn-auth {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-main);
-  padding: 5px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-}
-.btn-auth:hover {
-  border-color: var(--border-focus);
-  background: var(--bg-card-subtle);
-}
-.btn-auth.signed-in {
-  border-color: rgba(56, 189, 248, 0.4);
-  color: #38bdf8;
-}
-.auth-avatar {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  object-fit: cover;
-}
 </style>
 </head>
 <body>
@@ -902,10 +871,6 @@ body {
         <span class="wallet-label">Paper Balance</span>
         <span class="wallet-val" id="paperBalance">$1,000.00</span>
       </div>
-      <button class="btn-auth" id="loginBtn" title="Google Sign In (Cloud Sync)">
-        <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#38bdf8" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.761H12.545z"/></svg>
-        <span id="authBtnText">Sign In</span>
-      </button>
       <button class="sound-btn" id="soundToggle" title="Audio Feedback">
         <svg id="soundIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
       </button>
@@ -1170,41 +1135,7 @@ body {
 <!-- Floating Notification Toast -->
 <div class="toast-msg" id="toastMsg">Signal generated successfully</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, getDocFromServer, setDoc, updateDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-// --- Firebase State & Connection Test ---
-let auth = null;
-let db = null;
-let currentUser = null;
-
-function handleFirestoreError(error, operationType, path) {
-  const errInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    operationType,
-    path,
-    authInfo: {
-      userId: currentUser?.uid,
-      email: currentUser?.email,
-      emailVerified: currentUser?.emailVerified,
-      isAnonymous: currentUser?.isAnonymous
-    }
-  };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-}
-
-async function testConnection(firestore) {
-  try {
-    await getDocFromServer(doc(firestore, 'test', 'connection'));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn("Please check your Firebase configuration.");
-    }
-  }
-}
-
+<script>
 // --- Audio Synthesizer (Web Audio API) ---
 class SoundEngine {
   constructor() {
@@ -1562,26 +1493,6 @@ async function generateSignal() {
     renderSignalResult(data);
     showToast(`Signal ready: ${data.direction} (${data.confidence}%)`);
 
-    // Persist signal to Firestore if signed in
-    if (currentUser && db) {
-      try {
-        const sigRef = doc(db, 'users', currentUser.uid, 'signals', data.signal_id);
-        await setDoc(sigRef, {
-          userId: currentUser.uid,
-          signalId: data.signal_id,
-          symbol: data.symbol,
-          market: data.market,
-          direction: data.direction,
-          confidence: data.confidence,
-          timeframe: data.timeframe,
-          expirySeconds: data.expiry_seconds,
-          createdAt: new Date().toISOString()
-        });
-      } catch (e) {
-        handleFirestoreError(e, 'create', `users/${currentUser.uid}/signals/${data.signal_id}`);
-      }
-    }
-
     if (data.direction === 'CALL') sound.playCallTone();
     else if (data.direction === 'PUT') sound.playPutTone();
 
@@ -1720,36 +1631,10 @@ function resolveActiveTrade() {
 
   $('paperBalance').textContent = '$' + paperBalance.toFixed(2);
 
-  // If user is authenticated, persist trade to Firestore
-  if (currentUser && db) {
-    try {
-      const tradeId = 'tr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-      const tradeDocRef = doc(db, 'users', currentUser.uid, 'trades', tradeId);
-      setDoc(tradeDocRef, {
-        userId: currentUser.uid,
-        signalId: activeTrade.signalId || 'manual',
-        symbol: activeTrade.symbol,
-        market: activeTrade.market || 'REAL',
-        direction: activeTrade.direction,
-        stakeUsd: activeTrade.stake,
-        entryPrice: activeTrade.entryPrice,
-        exitPrice: exitPrice,
-        payoutRate: activeTrade.payout,
-        profitUsd: profit,
-        won: won,
-        status: won ? 'WON' : 'LOST',
-        createdAt: new Date().toISOString()
-      }).catch(err => handleFirestoreError(err, 'create', `users/${currentUser.uid}/trades/${tradeId}`));
-
-      // Update paper balance in user document
-      const userRef = doc(db, 'users', currentUser.uid);
-      updateDoc(userRef, {
-        paperBalance: paperBalance
-      }).catch(err => handleFirestoreError(err, 'update', `users/${currentUser.uid}`));
-    } catch (e) {
-      handleFirestoreError(e, 'write', `users/${currentUser.uid}/trades`);
-    }
-  }
+  // Persist updated paper balance locally
+  try {
+    localStorage.setItem('binany_paper_balance', paperBalance.toString());
+  } catch (e) {}
 
   // Add to History
   tradeHistory.unshift({
@@ -1760,6 +1645,9 @@ function resolveActiveTrade() {
     won,
     time: new Date().toLocaleTimeString()
   });
+  try {
+    localStorage.setItem('binany_trade_history', JSON.stringify(tradeHistory.slice(0, 30)));
+  } catch (e) {}
   renderTradeHistory();
   updateRiskGuardStats();
   activeTrade = null;
@@ -1798,111 +1686,26 @@ async function updateRiskGuardStats() {
   } catch (e) {}
 }
 
-// --- Firebase Initialization & Auth Integration ---
-async function initFirebase() {
-  try {
-    const res = await fetch('/api/firebase-config');
-    if (!res.ok) return;
-    const config = await res.json();
-    const app = initializeApp(config);
-    auth = getAuth(app);
-    db = getFirestore(app, config.firestoreDatabaseId);
-
-    testConnection(db);
-
-    onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
-      const loginBtn = $('loginBtn');
-      const authBtnText = $('authBtnText');
-      if (user) {
-        authBtnText.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Trader';
-        loginBtn.classList.add('signed-in');
-        loginBtn.title = `Signed in as ${user.email} (Tap to Sign Out)`;
-        showToast(`Signed in: ${user.displayName || user.email}`);
-
-        // Sync User Profile
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const snap = await getDoc(userDocRef);
-          if (snap.exists()) {
-            const data = snap.data();
-            if (typeof data.paperBalance === 'number') {
-              paperBalance = data.paperBalance;
-              $('paperBalance').textContent = '$' + paperBalance.toFixed(2);
-            }
-          } else {
-            await setDoc(userDocRef, {
-              userId: user.uid,
-              displayName: user.displayName || 'Trader',
-              email: user.email || '',
-              paperBalance: 1000.00,
-              createdAt: new Date().toISOString()
-            });
-          }
-        } catch (e) {
-          handleFirestoreError(e, 'get', `users/${user.uid}`);
-        }
-
-        // Load Persistent Trade History from Firestore
-        try {
-          const tradesRef = collection(db, 'users', user.uid, 'trades');
-          const q = query(tradesRef, orderBy('createdAt', 'desc'), limit(20));
-          const querySnap = await getDocs(q);
-          const cloudTrades = [];
-          querySnap.forEach(docSnap => {
-            const t = docSnap.data();
-            cloudTrades.push({
-              symbol: t.symbol,
-              direction: t.direction,
-              stake: t.stakeUsd,
-              profit: t.profitUsd || 0,
-              won: t.won || false,
-              time: new Date(t.createdAt).toLocaleTimeString()
-            });
-          });
-          if (cloudTrades.length) {
-            tradeHistory = cloudTrades;
-            renderTradeHistory();
-          }
-        } catch (e) {
-          handleFirestoreError(e, 'list', `users/${user.uid}/trades`);
-        }
-      } else {
-        authBtnText.textContent = 'Sign In';
-        loginBtn.classList.remove('signed-in');
-        loginBtn.title = 'Google Sign In (Cloud Sync)';
-      }
-    });
-
-    $('loginBtn').onclick = async () => {
-      sound.playClick();
-      if (currentUser) {
-        if (confirm(`Signed in as ${currentUser.email}.\nDo you want to sign out?`)) {
-          await signOut(auth);
-          showToast('Signed out of cloud sync');
-        }
-      } else {
-        try {
-          const provider = new GoogleAuthProvider();
-          await signInWithPopup(auth, provider);
-        } catch (err) {
-          console.error('Sign-in error:', err);
-          showToast(err.message || 'Authentication failed');
-        }
-      }
-    };
-  } catch (err) {
-    console.warn('Firebase init notice:', err);
-  }
-}
-
 // --- Event Listeners Setup ---
 document.addEventListener('DOMContentLoaded', () => {
+  // Restore saved balance and history
+  try {
+    const savedBal = localStorage.getItem('binany_paper_balance');
+    if (savedBal && !isNaN(parseFloat(savedBal))) {
+      paperBalance = parseFloat(savedBal);
+      $('paperBalance').textContent = '$' + paperBalance.toFixed(2);
+    }
+    const savedHist = localStorage.getItem('binany_trade_history');
+    if (savedHist) {
+      tradeHistory = JSON.parse(savedHist);
+      renderTradeHistory();
+    }
+  } catch (e) {}
+
   renderQuickAssetsStrip();
   renderModalAssetList();
   selectAsset(ASSETS[0].id);
   updateRiskGuardStats();
-  initFirebase();
 
   $('generateSignalBtn').onclick = generateSignal;
   $('executeCallBtn').onclick = () => executePaperTrade('CALL');

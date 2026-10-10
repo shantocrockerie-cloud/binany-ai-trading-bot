@@ -2,7 +2,6 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
@@ -469,20 +468,6 @@ app.post('/api/paper-trade', (req: Request, res: Response) => {
     direction,
     stake_usd: stake,
   });
-});
-
-app.get('/api/firebase-config', (_req: Request, res: Response) => {
-  try {
-    const configPath = path.join(__dirname, 'firebase-applet-config.json');
-    if (fs.existsSync(configPath)) {
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      res.json(config);
-    } else {
-      res.status(404).json({ error: 'Firebase config not found' });
-    }
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
 // Serve static frontend
